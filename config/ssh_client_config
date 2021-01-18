@@ -1,0 +1,4 @@
+Host buya
+    HostName 142.93.67.204
+    Port 22
+    IdentityFile ~/.ssh/buya_rsa

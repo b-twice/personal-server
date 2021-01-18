@@ -1,0 +1,6 @@
+PermitRootLogin prohibit-password
+PubkeyAuthentication yes
+AllowUsers root
+X11Forwarding no
+StrictModes yes
+IgnoreRhosts yes
