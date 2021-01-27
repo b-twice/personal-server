@@ -1,6 +1,6 @@
 HOST='root@buya'
 
-.PHONY: install ssh package iptables kubernetes_install k8s
+.PHONY: install ssh package iptables kubernetes_install k8s app
 
 
 install:
@@ -29,9 +29,8 @@ k8s:
 	kubectl apply -f k8s/ingress-nginx-v0.43.0.yml
 	kubectl apply -f k8s/cert-manager-v1.1.0.yml
 	kubectl apply -f k8s/lets-encrypt-issuer.yml
-	kubectl apply -f k8s/test.yml
-	
-	# kubectl wait --namespace ingress-nginx \
-	# 		--for=condition=ready pod \
-	# 		--selector=app.kubernetes.io/component=controller \
-	# 		--timeout=120s
+	sops -d --output secrets_decrypted/dockerconfigjson.yml secrets/dockerconfigjson.yml
+	kubectl apply -f secrets_decrypted/dockerconfigjson.yml
+
+app:
+	kubectl apply -f apps/test-portfolio.yml
