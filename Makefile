@@ -31,6 +31,7 @@ k8s:
 	kubectl apply -f k8s/lets-encrypt-issuer.yml
 	sops -d --output secrets_decrypted/dockerconfigjson.yml secrets/dockerconfigjson.yml
 	kubectl apply -f secrets_decrypted/dockerconfigjson.yml
+	kubectl apply -f k8s/nginx-configmap.yaml
 
 app:
 	kubectl apply -f apps/test-portfolio.yml
