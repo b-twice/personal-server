@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: test-portfolio
+  name: test-me
   labels:
-    app: test-portfolio
+    app: test-me
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: test-portfolio
+      app: test-me
   template:
     metadata:
       labels:
-        app: test-portfolio
+        app: test-me
     spec:
       containers:
       - name: webserver
-        image: ghcr.io/brianbrowndev/b-site:latest
+        image: ghcr.io/brianbrowndev/b-me:latest
         imagePullPolicy: Always
         ports:
           - containerPort: 80
@@ -28,13 +28,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: test-portfolio
+  name: test-me
 spec:
   selector:
-    app: test-portfolio
+    app: test-me
   ports:
     - protocol: TCP
-      port: 8080
+      port: 8083
       targetPort: 80
+      name: http
   clusterIP: None
   type: ClusterIP

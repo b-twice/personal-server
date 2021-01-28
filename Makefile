@@ -1,6 +1,6 @@
 HOST='root@buya'
 
-.PHONY: install ssh package iptables kubernetes_install k8s app
+.PHONY: install ssh package iptables kubernetes_install k8s nginx app
 
 
 install:
@@ -31,7 +31,12 @@ k8s:
 	kubectl apply -f k8s/lets-encrypt-issuer.yml
 	sops -d --output secrets_decrypted/dockerconfigjson.yml secrets/dockerconfigjson.yml
 	kubectl apply -f secrets_decrypted/dockerconfigjson.yml
-	kubectl apply -f k8s/nginx-configmap.yaml
+
+nginx:
+	kubectl apply -f nginx/nginx-configmap.yml
+	kubectl apply -f nginx/text-nginx.yml
 
 app:
 	kubectl apply -f apps/test-portfolio.yml
+	kubectl apply -f apps/test-groceries.yml
+	kubectl apply -f apps/test-me.yml

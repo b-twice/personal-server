@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: test-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - test.brianbrown.dev
+    secretName: test-tls
+  rules:
+  - host: test.brianbrown.dev
+    http:
+      paths:
+      - path: /me
+        backend:
+          serviceName: test-me
+          servicePort: 80
+      - path: /groceries
+        backend:
+          serviceName: test-groceries
+          servicePort: 80
+      - path: /
+        backend:
+          serviceName: test-portfolio
+          servicePort: 80
