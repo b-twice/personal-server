@@ -1,6 +1,6 @@
 HOST='root@buya'
 
-.PHONY: install ssh package iptables kubernetes_install k8s nginx app
+.PHONY: install ssh package iptables kubernetes_install k8s secrets nginx storage app
 
 
 install:
@@ -26,17 +26,26 @@ kubernetes_install:
 					curl -sfL https://get.k3s.io | sh -'
 
 k8s:
+	kubectl apply -f k8s/local-path-storage-v0.0.19.yml
 	kubectl apply -f k8s/ingress-nginx-v0.43.0.yml
 	kubectl apply -f k8s/cert-manager-v1.1.0.yml
 	kubectl apply -f k8s/lets-encrypt-issuer.yml
+
+secrets:
 	sops -d --output secrets_decrypted/dockerconfigjson.yml secrets/dockerconfigjson.yml
 	kubectl apply -f secrets_decrypted/dockerconfigjson.yml
+	sops -d --output secrets_decrypted/appsettings.secrets.json secrets/appsettings.secrets.json
+	kubectl create secret generic secret-api-appsettings --from-file=secrets_decrypted/appsettings.secrets.json
 
 nginx:
 	kubectl apply -f nginx/nginx-configmap.yml
 	kubectl apply -f nginx/text-nginx.yml
 
+storage:
+	kubectl apply -f storage/test-pvc.yml
+
 app:
 	kubectl apply -f apps/test-portfolio.yml
 	kubectl apply -f apps/test-groceries.yml
 	kubectl apply -f apps/test-me.yml
+	kubectl apply -f apps/test-api.yml

@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-api
+  labels:
+    app: test-api
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: test-api
+  template:
+    metadata:
+      labels:
+        app: test-api
+    spec:
+      containers:
+      - name: webapi
+        image: ghcr.io/brianbrowndev/b-api:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80
+        volumeMounts:
+        - name: api-secrets
+          mountPath: /app/secrets
+          readOnly: true
+        - name: api-data
+          mountPath: /data
+      imagePullSecrets:
+        - name: dockerconfigjson-github-com
+      volumes:
+      - name: api-secrets
+        secret:
+          secretName: secret-api-appsettings
+      - name: api-data
+        persistentVolumeClaim:
+          claimName: local-test-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-api
+spec:
+  selector:
+    app: test-api
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 80
+      name: http
+  clusterIP: None
+  type: ClusterIP
