@@ -1,6 +1,6 @@
 HOST='root@buya'
 
-.PHONY: install ssh package iptables kubernetes_install k8s secrets nginx storage app
+.PHONY: install ssh package iptables kubernetes_install k8s secrets nginx storage app app_data
 
 
 install:
@@ -42,10 +42,16 @@ nginx:
 	kubectl apply -f nginx/text-nginx.yml
 
 storage:
-	kubectl apply -f storage/test-pvc.yml
+	kubectl apply -f storage/test-data-pvc.yml
+	kubectl apply -f storage/test-resources-pvc.yml
 
 app:
 	kubectl apply -f apps/test-portfolio.yml
 	kubectl apply -f apps/test-groceries.yml
 	kubectl apply -f apps/test-me.yml
 	kubectl apply -f apps/test-api.yml
+
+app_data:
+	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep test-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/budget.db '{}':/data/budget.db
+	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep test-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/app.db '{}':/data/app.db
+	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep test-api | xargs -I '{}' kubectl cp ${HOME}/git/b-api/resources/org '{}':/app/resources

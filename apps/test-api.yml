@@ -28,6 +28,8 @@ spec:
           readOnly: true
         - name: api-data
           mountPath: /data
+        - name: api-resources
+          mountPath: /app/resources
       imagePullSecrets:
         - name: dockerconfigjson-github-com
       volumes:
@@ -36,7 +38,10 @@ spec:
           secretName: secret-api-appsettings
       - name: api-data
         persistentVolumeClaim:
-          claimName: local-test-pvc
+          claimName: local-test-data-pvc
+      - name: api-resources
+        persistentVolumeClaim:
+          claimName: local-test-resources-pvc
 ---
 apiVersion: v1
 kind: Service
