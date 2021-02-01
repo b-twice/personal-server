@@ -70,4 +70,4 @@ app_data_test:
 app_data_prod:
 	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/budget.db '{}':/data/budget.db
 	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/app.db '{}':/data/app.db
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp ${HOME}/git/b-api/resources/org '{}':/app/resources
+	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp ${HOME}/git/b-org/publish/ '{}':/app/resources/org/
