@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prod-api
+  labels:
+    app: prod-api
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: prod-api
+  template:
+    metadata:
+      labels:
+        app: prod-api
+    spec:
+      containers:
+      - name: webapi
+        image: ghcr.io/brianbrowndev/b-api:v3.0.0
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80
+        volumeMounts:
+        - name: api-secrets
+          mountPath: /app/secrets
+          readOnly: true
+        - name: api-data
+          mountPath: /data
+        - name: api-resources
+          mountPath: /app/resources
+      imagePullSecrets:
+        - name: dockerconfigjson-github-com
+      volumes:
+      - name: api-secrets
+        secret:
+          secretName: secret-api-appsettings
+      - name: api-data
+        persistentVolumeClaim:
+          claimName: local-prod-data-pvc
+      - name: api-resources
+        persistentVolumeClaim:
+          claimName: local-prod-resources-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prod-api
+spec:
+  selector:
+    app: prod-api
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 80
+      name: http
+  clusterIP: None
+  type: ClusterIP

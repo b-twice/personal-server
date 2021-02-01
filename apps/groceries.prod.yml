@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prod-groceries
+  labels:
+    app: prod-groceries
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: prod-groceries
+  template:
+    metadata:
+      labels:
+        app: prod-groceries
+    spec:
+      containers:
+      - name: webserver
+        image: ghcr.io/brianbrowndev/b-grocery-list:v3.0.0
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80
+      imagePullSecrets:
+        - name: dockerconfigjson-github-com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prod-groceries
+spec:
+  selector:
+    app: prod-groceries
+  ports:
+    - protocol: TCP
+      port: 4200
+      targetPort: 80
+      name: http
+  clusterIP: None

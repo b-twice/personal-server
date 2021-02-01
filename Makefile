@@ -1,6 +1,6 @@
 HOST='root@buya'
 
-.PHONY: install ssh package iptables kubernetes_install k8s secrets nginx storage app app_data
+.PHONY: install ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod app_data_test app_data_prod
 
 
 install:
@@ -39,19 +39,35 @@ secrets:
 
 nginx:
 	kubectl apply -f nginx/nginx-configmap.yml
-	kubectl apply -f nginx/text-nginx.yml
+	kubectl apply -f nginx/nginx-ingress.test.yml
+	kubectl apply -f nginx/nginx-ingress.prod.yml
 
-storage:
-	kubectl apply -f storage/test-data-pvc.yml
-	kubectl apply -f storage/test-resources-pvc.yml
+storage_test:
+	kubectl apply -f storage/data-pvc.test.yml
+	kubectl apply -f storage/resources-pvc.test.yml
 
-app:
-	kubectl apply -f apps/test-portfolio.yml
-	kubectl apply -f apps/test-groceries.yml
-	kubectl apply -f apps/test-me.yml
-	kubectl apply -f apps/test-api.yml
+storage_prod:
+	kubectl apply -f storage/data-pvc.prod.yml
+	kubectl apply -f storage/resources-pvc.prod.yml
 
-app_data:
+apps_test:
+	kubectl apply -f apps/portfolio.test.yml
+	kubectl apply -f apps/groceries.test.yml
+	kubectl apply -f apps/me.test.yml
+	kubectl apply -f apps/api.test.yml
+
+apps_prod:
+	kubectl apply -f apps/portfolio.prod.yml
+	kubectl apply -f apps/groceries.prod.yml
+	kubectl apply -f apps/me.prod.yml
+	kubectl apply -f apps/api.prod.yml
+
+app_data_test:
 	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep test-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/budget.db '{}':/data/budget.db
 	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep test-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/app.db '{}':/data/app.db
 	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep test-api | xargs -I '{}' kubectl cp ${HOME}/git/b-api/resources/org '{}':/app/resources
+
+app_data_prod:
+	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/budget.db '{}':/data/budget.db
+	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/app.db '{}':/data/app.db
+	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp ${HOME}/git/b-api/resources/org '{}':/app/resources
