@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: webapi
-        image: ghcr.io/brianbrowndev/b-api:v3.0.0
+        image: ghcr.io/brianbrowndev/b-api:v3.1.1
         imagePullPolicy: Always
         ports:
           - containerPort: 80

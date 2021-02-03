@@ -1,7 +1,10 @@
 HOST='root@buya'
+GIT='https://github.com/brianbrowndev'
+REG='ghcr.io/brianbrowndev'
 
-.PHONY: install ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod app_data_test app_data_prod
+.PHONY: install deploy ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod app_data_test app_data_prod img_prod 
 
+deploy: ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod app_data_test app_data_prod img_prod
 
 install:
 	sops -d --extract '["public_key"]' --output ~/.ssh/buya_rsa.pub secrets/ssh.yml
@@ -55,19 +58,36 @@ apps_test:
 	kubectl apply -f apps/groceries.test.yml
 	kubectl apply -f apps/me.test.yml
 	kubectl apply -f apps/api.test.yml
+	kubectl apply -f apps/budget.test.yml
 
 apps_prod:
 	kubectl apply -f apps/portfolio.prod.yml
 	kubectl apply -f apps/groceries.prod.yml
 	kubectl apply -f apps/me.prod.yml
 	kubectl apply -f apps/api.prod.yml
+	kubectl apply -f apps/budget.prod.yml
+
+define setdata
+	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep $(1) | xargs -I '{}' kubectl cp ${HOME}/$(2) '{}':$(3)
+endef
 
 app_data_test:
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep test-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/budget.db '{}':/data/budget.db
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep test-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/app.db '{}':/data/app.db
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep test-api | xargs -I '{}' kubectl cp ${HOME}/git/b-api/resources/org '{}':/app/resources
+	$(call setdata,test-api,git/b-database/budget.db,/data/budget.db)
+	$(call setdata,test-api,git/b-database/app.db,/data/app.db)
+	$(call setdata,test-api,git/b-org/publish,/app/resources/org/)
 
 app_data_prod:
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/budget.db '{}':/data/budget.db
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp ${HOME}/git/b-database/app.db '{}':/data/app.db
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp ${HOME}/git/b-org/publish/ '{}':/app/resources/org/
+	$(call setdata,prod-api,git/b-database/budget.db,/data/budget.db)
+	$(call setdata,prod-api,git/b-database/app.db,/data/app.db)
+	$(call setdata,prod-api,git/b-org/publish,/app/resources/org/)
+
+define setimg
+	curl -N -s ${GIT}/$(1)/tags/ | grep -o -a -m 1 "$Version v[0-9].[0-9].[0-9]" | xargs -I '{}' kubectl set image deployment/$(2) $(3)=${REG}/$(1):'{}' --record
+endef
+
+img_prod:
+	$(call setimg,b-api,prod-api,webapi)
+	$(call setimg,b-me,prod-me,webserver)
+	$(call setimg,b-grocery-list,prod-groceries,webserver)
+	$(call setimg,b-site,prod-portfolio,webserver)
+	$(call setimg,b-budget,prod-budget,webserver)
