@@ -7,32 +7,30 @@ metadata:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   tls:
-  - hosts:
-    - test.brianbrown.dev
-    secretName: test-tls
+    - hosts:
+        - test.brianbrown.dev
+      secretName: test-tls
   rules:
-  - host: test.brianbrown.dev
-    http:
-      paths:
-      - path: /api/
-        backend:
-          serviceName: test-api
-          servicePort: 80
-      - path: /me
-        backend:
-          serviceName: test-me
-          servicePort: 80
-      - path: /budget
-        backend:
-          serviceName: test-budget
-          servicePort: 80
-      - path: /groceries
-        backend:
-          serviceName: test-groceries
-          servicePort: 80
-      - path: /
-        backend:
-          serviceName: test-portfolio
-          servicePort: 80
-
-
+    - host: test.brianbrown.dev
+      http:
+        paths:
+          - path: /api/
+            backend:
+              serviceName: test-api
+              servicePort: 80
+          - path: /me
+            backend:
+              serviceName: test-me
+              servicePort: 80
+          - path: /budget
+            backend:
+              serviceName: test-budget
+              servicePort: 80
+          - path: /groceries
+            backend:
+              serviceName: test-groceries
+              servicePort: 80
+          - path: /
+            backend:
+              serviceName: test-portfolio
+              servicePort: 80
