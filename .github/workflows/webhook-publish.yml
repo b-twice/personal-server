@@ -29,4 +29,3 @@ jobs:
           tags: ghcr.io/brianbrowndev/webhook:latest
       - name: webhook Image digest
         run: echo webhook ${{ steps.docker_build_webhook.outputs.digest }}
-      - run: docker push ghcr.io/brianbrowndev/webhook:latest
