@@ -2,9 +2,9 @@ HOST='root@buya'
 GIT='https://github.com/brianbrowndev'
 REG='ghcr.io/brianbrowndev'
 
-.PHONY: install deploy ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod app_data_test app_data_prod img_prod 
+.PHONY: install deploy ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod app_data_test app_data_prod img_prod webhook
 
-deploy: ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod app_data_test app_data_prod img_prod
+deploy: ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod app_data_test app_data_prod img_prod webhook
 
 install:
 	sops -d --extract '["public_key"]' --output ~/.ssh/buya_rsa.pub secrets/ssh.yml
@@ -38,7 +38,7 @@ secrets:
 	sops -d --output secrets_decrypted/dockerconfigjson.yml secrets/dockerconfigjson.yml
 	kubectl apply -f secrets_decrypted/dockerconfigjson.yml
 	sops -d --output secrets_decrypted/appsettings.secrets.json secrets/appsettings.secrets.json
-	kubectl create secret generic secret-api-appsettings --from-file=secrets_decrypted/appsettings.secrets.json
+	kubectl apply secret generic secret-api-appsettings --from-file=secrets_decrypted/appsettings.secrets.json
 
 nginx:
 	kubectl apply -f nginx/nginx-configmap.yml
@@ -82,12 +82,18 @@ app_data_prod:
 	$(call setdata,prod-api,git/b-org/publish,/app/resources/org/)
 
 define setimg
-	curl -N -s ${GIT}/$(1)/tags/ | grep -o -a -m 1 "$Version v[0-9].[0-9].[0-9]" | xargs -I '{}' kubectl set image deployment/$(2) $(3)=${REG}/$(1):'{}' --record
+	curl -N -s ${GIT}/$(1)/tags/ | grep -o -a -m 1 "$$Version v[0-9].[0-9].[0-9]" | xargs -I '{}' kubectl set image deployment/$(2) $(3)=${REG}/$(1):'{}' --record
 endef
 
 img_prod:
-	$(call setimg,b-api,prod-api,webapi)
+	$(call setimg,b-api,prod-api,webserver)
 	$(call setimg,b-me,prod-me,webserver)
 	$(call setimg,b-grocery-list,prod-groceries,webserver)
 	$(call setimg,b-site,prod-portfolio,webserver)
 	$(call setimg,b-budget,prod-budget,webserver)
+
+webhook:
+	sops -d --output secrets_decrypted/webhook-configmap.yml secrets/webhook-configmap.yml
+	kubectl apply -f secrets_decrypted/webhook-configmap.yml
+	kubectl apply -f webhook/webhook.yml
+	kubectl apply -f webhook/nginx-ingress.yml

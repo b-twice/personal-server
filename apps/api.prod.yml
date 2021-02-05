@@ -17,31 +17,31 @@ spec:
         app: prod-api
     spec:
       containers:
-      - name: webapi
-        image: ghcr.io/brianbrowndev/b-api:v3.1.1
-        imagePullPolicy: Always
-        ports:
-          - containerPort: 80
-        volumeMounts:
-        - name: api-secrets
-          mountPath: /app/secrets
-          readOnly: true
-        - name: api-data
-          mountPath: /data
-        - name: api-resources
-          mountPath: /app/resources
+        - name: webserver
+          image: ghcr.io/brianbrowndev/b-api:v3.1.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: api-secrets
+              mountPath: /app/secrets
+              readOnly: true
+            - name: api-data
+              mountPath: /data
+            - name: api-resources
+              mountPath: /app/resources
       imagePullSecrets:
         - name: dockerconfigjson-github-com
       volumes:
-      - name: api-secrets
-        secret:
-          secretName: secret-api-appsettings
-      - name: api-data
-        persistentVolumeClaim:
-          claimName: local-prod-data-pvc
-      - name: api-resources
-        persistentVolumeClaim:
-          claimName: local-prod-resources-pvc
+        - name: api-secrets
+          secret:
+            secretName: secret-api-appsettings
+        - name: api-data
+          persistentVolumeClaim:
+            claimName: local-prod-data-pvc
+        - name: api-resources
+          persistentVolumeClaim:
+            claimName: local-prod-resources-pvc
 ---
 apiVersion: v1
 kind: Service
