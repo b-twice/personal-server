@@ -2,7 +2,7 @@ HOST='root@buya'
 GIT='https://github.com/brianbrowndev'
 REG='ghcr.io/brianbrowndev'
 
-.PHONY: install deploy ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod app_data_test app_data_prod app_resources_prod app_resources_test img_prod webhook db_backup db_build db_deploy_test db_deploy jobs_test jobs_prod
+.PHONY: install deploy ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod img_prod webhook jobs_test jobs_prod
 
 deploy: ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod app_data_test app_data_prod img_prod webhook
 
@@ -67,30 +67,6 @@ apps_prod:
 	kubectl apply -f apps/api.prod.yml
 	kubectl apply -f apps/budget.prod.yml
 
-define setdata
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep $(1) | xargs -I '{}' kubectl cp ${HOME}/$(2) '{}':$(3)
-endef
-
-app_data_test:
-	$(call setdata,test-api,git/b-database/budget.db,/data/budget.db)
-	$(call setdata,test-api,git/b-database/app.db,/data/app.db)
-
-app_data_prod:
-	$(call setdata,prod-api,git/b-database/budget.db,/data/budget.db)
-	$(call setdata,prod-api,git/b-database/app.db,/data/app.db)
-
-app_resources_publish: 
-	#  emacs -batch -l ~/.emacs.d/init.el --eval "(run-hooks 'emacs-startup-hook)" --eval "(org-publish-remove-all-timestamps)" --eval '(org-publish-project "org")'; echo $?
-	 emacs -batch -l ~/.emacs.d/init.el --eval "(run-hooks 'emacs-startup-hook)" --eval '(org-publish-project "org")'; echo $?
-
-app_resources_test: app_resources_publish
-	kubectl exec -it deploy/test-api -- rm -rf /app/resources/org/ 
-	$(call setdata,test-api,git/b-org/publish,/app/resources/org/)
-
-app_resources_prod: app_resources_publish
-	kubectl exec -it deploy/prod-api -- rm -rf /app/resources/org/
-	$(call setdata,prod-api,git/b-org/publish,/app/resources/org/)
-
 define setimg
 	curl -N -s ${GIT}/$(1)/tags/ | grep -o -a -m 1 "$$Version v[0-9].[0-9].[0-9]" | xargs -I '{}' kubectl set image deployment/$(2) $(3)=${REG}/$(1):'{}' --record
 endef
@@ -107,26 +83,6 @@ webhook:
 	kubectl apply -f secrets_decrypted/webhook-configmap.yml
 	kubectl apply -f webhook/webhook.yml
 	kubectl apply -f webhook/nginx-ingress.yml
-
-db_backup:
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp  '{}':/data/app.db ${HOME}/git/b-database/app.db
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp  '{}':/data/budget.db ${HOME}/git/b-database/budget.db
-
-db_build: db_backup
-	cd ${HOME}/git/b-database; \
-	sqlite3 ./app.db < ./database/3.2.0/build.sql
-
-db_deploy_test:
-	set -x
-	read -p "CAUTION: PROD DB WILL BE UPDATED. Press enter to proceed."
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep test-api | xargs -I '{}' kubectl cp  ${HOME}/git/b-database/app.db '{}':/data/app.db
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep test-api | xargs -I '{}' kubectl cp  ${HOME}/git/b-database/budget.db '{}':/data/budget.db
-
-db_deploy:
-	set -x
-	read -p "CAUTION: PROD DB WILL BE UPDATED. Press enter to proceed."
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp  ${HOME}/git/b-database/app.db '{}':/data/app.db
-	kubectl get pods --no-headers -o custom-columns=":metadata.name" | grep prod-api | xargs -I '{}' kubectl cp  ${HOME}/git/b-database/budget.db '{}':/data/budget.db
 
 jobs_test:
 	kubectl apply -f jobs/crypto-test.yml
