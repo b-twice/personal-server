@@ -86,6 +86,8 @@ webhook:
 
 jobs_test:
 	kubectl apply -f jobs/crypto-test.yml
+	kubectl apply -f jobs/recipe-test.yml
 
 jobs_prod:
 	kubectl apply -f jobs/crypto-prod.yml
+	kubectl apply -f jobs/recipe-prod.yml

@@ -1,0 +1,30 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: recipe-etl-test
+spec:
+  schedule: "0 */4 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: console
+              image: ghcr.io/brianbrowndev/recipe-etl:latest
+              imagePullPolicy: Always
+              env:
+                - name: TZ
+                  value: "America/New_York"
+              volumeMounts:
+                - name: api-data
+                  mountPath: /data
+          imagePullSecrets:
+            - name: dockerconfigjson-github-com
+          restartPolicy: OnFailure
+          volumes:
+            - name: api-data
+              persistentVolumeClaim:
+                claimName: local-test-data-pvc
