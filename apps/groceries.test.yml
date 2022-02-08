@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: webserver
-        image: ghcr.io/brianbrowndev/b-grocery-list:latest
+        image: ghcr.io/b-twice/b-grocery-list:latest
         imagePullPolicy: Always
         ports:
           - containerPort: 80

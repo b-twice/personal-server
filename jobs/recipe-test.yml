@@ -13,7 +13,7 @@ spec:
         spec:
           containers:
             - name: console
-              image: ghcr.io/brianbrowndev/recipe-etl:latest
+              image: ghcr.io/b-twice/recipe-etl:latest
               imagePullPolicy: Always
               env:
                 - name: TZ

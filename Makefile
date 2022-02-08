@@ -1,6 +1,6 @@
 HOST='root@buya'
-GIT='https://github.com/brianbrowndev'
-REG='ghcr.io/brianbrowndev'
+GIT='https://github.com/b-twice'
+REG='ghcr.io/b-twice'
 
 .PHONY: install deploy ssh package iptables kubernetes_install k8s secrets nginx storage_test storage_prod apps_test apps_prod img_prod webhook jobs_test jobs_prod
 

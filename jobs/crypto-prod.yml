@@ -13,7 +13,7 @@ spec:
         spec:
           containers:
             - name: console
-              image: ghcr.io/brianbrowndev/crypto-etl:latest
+              image: ghcr.io/b-twice/crypto-etl:latest
               imagePullPolicy: Always
               env:
                 - name: TZ

@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: webserver
-        image: ghcr.io/brianbrowndev/b-budget:v1.1.0
+        image: ghcr.io/b-twice/b-budget:v1.1.0
         imagePullPolicy: Always
         ports:
           - containerPort: 80

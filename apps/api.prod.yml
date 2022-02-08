@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: webserver
-          image: ghcr.io/brianbrowndev/b-api:v3.1.1
+          image: ghcr.io/b-twice/b-api:v3.1.1
           imagePullPolicy: Always
           ports:
             - containerPort: 80

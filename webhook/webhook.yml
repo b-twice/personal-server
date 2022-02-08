@@ -48,7 +48,7 @@ spec:
       serviceAccountName: deployer
       containers:
         - name: webhook
-          image: ghcr.io/brianbrowndev/webhook:latest
+          image: ghcr.io/b-twice/webhook:latest
           imagePullPolicy: Always
           args:
             - "-hooks=/data/hook.json"

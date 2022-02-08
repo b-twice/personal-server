@@ -26,6 +26,6 @@ jobs:
           context: webhook
           file: webhook/Dockerfile
           push: true
-          tags: ghcr.io/brianbrowndev/webhook:latest
+          tags: ghcr.io/b-twice/webhook:latest
       - name: webhook Image digest
         run: echo webhook ${{ steps.docker_build_webhook.outputs.digest }}
