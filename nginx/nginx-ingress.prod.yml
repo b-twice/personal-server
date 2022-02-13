@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1 
 kind: Ingress
 metadata:
   name: prod-ingress
@@ -17,24 +17,39 @@ spec:
     http:
       paths:
       - path: /api/
+        pathType: Prefix
         backend:
-          serviceName: prod-api
-          servicePort: 80
+          service:
+            name: prod-api
+            port:
+              number: 80
       - path: /me
+        pathType: Prefix
         backend:
-          serviceName: prod-me
-          servicePort: 80
+          service:
+            name: prod-me
+            port:
+              number: 80
       - path: /budget
+        pathType: Prefix
         backend:
-          serviceName: prod-budget
-          servicePort: 80
+          service:
+            name: prod-budget
+            port:
+              number: 80
       - path: /groceries
+        pathType: Prefix
         backend:
-          serviceName: prod-groceries
-          servicePort: 80
+          service:
+            name: prod-groceries
+            port:
+              number: 80
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: prod-portfolio
-          servicePort: 80
+          service:
+            name: prod-portfolio
+            port:
+              number: 80
 
 

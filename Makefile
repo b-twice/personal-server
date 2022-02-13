@@ -29,9 +29,9 @@ kubernetes_install:
 					curl -sfL https://get.k3s.io | sh -'
 
 k8s:
-	kubectl apply -f k8s/local-path-storage-v0.0.19.yml
-	kubectl apply -f k8s/ingress-nginx-v0.43.0.yml
-	kubectl apply -f k8s/cert-manager-v1.1.0.yml
+	kubectl apply -f k8s/local-path-storage-v0.0.21.yml
+	kubectl apply -f k8s/ingress-nginx-v1.1.1.yml
+	kubectl apply -f k8s/cert-manager-v1.7.1.yml
 	kubectl apply -f k8s/lets-encrypt-issuer.yml
 
 secrets:

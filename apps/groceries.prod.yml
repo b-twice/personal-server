@@ -7,7 +7,10 @@ metadata:
 spec:
   replicas: 1
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: prod-groceries
@@ -18,7 +21,7 @@ spec:
     spec:
       containers:
       - name: webserver
-        image: ghcr.io/b-twice/b-grocery-list:v3.0.0
+        image: ghcr.io/b-twice/b-grocery-list:v4.0.5
         imagePullPolicy: Always
         ports:
           - containerPort: 80

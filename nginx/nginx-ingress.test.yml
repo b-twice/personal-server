@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: test-ingress
@@ -15,22 +15,37 @@ spec:
       http:
         paths:
           - path: /api/
+            pathType: Prefix
             backend:
-              serviceName: test-api
-              servicePort: 80
+              service:
+                name: test-api
+                port: 
+                  number: 80
           - path: /me
+            pathType: Prefix
             backend:
-              serviceName: test-me
-              servicePort: 80
+              service:
+                name: test-me
+                port:
+                  number: 80
           - path: /budget
+            pathType: Prefix
             backend:
-              serviceName: test-budget
-              servicePort: 80
+              service:
+                name: test-budget
+                port: 
+                  number: 80
           - path: /groceries
+            pathType: Prefix
             backend:
-              serviceName: test-groceries
-              servicePort: 80
+              service:
+                name: test-groceries
+                port:
+                  number: 80
           - path: /
+            pathType: Prefix
             backend:
-              serviceName: test-portfolio
-              servicePort: 80
+              service:
+                name: test-portfolio
+                port:
+                  number: 80
